@@ -1,0 +1,10 @@
+{
+  "name": "elm-deps",
+  "version": "1.0.0",
+  "description": "Example usage of elm-solve-deps-wasm",
+  "main": "index.js",
+  "license": "MPL-2.0",
+  "dependencies": {
+    "elm-solve-deps-wasm": "file:../pkg"
+  }
+}
