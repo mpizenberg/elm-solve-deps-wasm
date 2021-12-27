@@ -9,6 +9,7 @@ use anyhow::Context;
 use pubgrub::error::PubGrubError;
 use pubgrub::report::{DefaultStringReporter, Reporter};
 use pubgrub::version::SemanticVersion as SemVer;
+use wee_alloc::WeeAlloc;
 
 // Useful references:
 // Returning Vec<T>: https://github.com/rustwasm/wasm-bindgen/issues/111
@@ -20,6 +21,10 @@ use elm_solve_deps::solver::solve_deps_with;
 use wasm_bindgen::prelude::*;
 
 mod utils;
+
+// Use `wee_alloc` as the global allocator.
+#[global_allocator]
+static ALLOC: WeeAlloc = WeeAlloc::INIT;
 
 /// Initialize the panic hook for more meaningful errors in case of panics,
 /// and also initialize the logger for the wasm code.
