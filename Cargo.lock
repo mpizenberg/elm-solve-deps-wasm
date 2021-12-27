@@ -33,6 +33,8 @@ dependencies = [
 [[package]]
 name = "elm-solve-deps"
 version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d6e7ec357c32366ecd3b4a286dbbfa9326368c4defbbc572c2ec4cc5da0310e8"
 dependencies = [
  "pubgrub",
  "serde",
