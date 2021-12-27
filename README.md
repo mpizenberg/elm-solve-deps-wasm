@@ -46,8 +46,7 @@ So in summary, the steps to get the most shrinked wasm module are the following:
 
 ```sh
 wasm-pack build --target nodejs
-wasm-snip --snip-rust-panicking-code -p "core::fmt::float::<impl core::fmt::Display for f64>::fmt::.*" -o snipped.wasm pkg/elm_solv
-e_deps_wasm_bg.wasm
+wasm-snip --snip-rust-panicking-code -p "core::fmt::float::<impl core::fmt::Display for f64>::fmt::.*" -o snipped.wasm pkg/elm_solve_deps_wasm_bg.wasm
 wasm-opt -Oz -o output.wasm snipped.wasm
 cp output.wasm pkg/elm_solve_deps_wasm_bg.wasm
 ```

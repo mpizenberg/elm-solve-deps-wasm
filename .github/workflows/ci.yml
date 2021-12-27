@@ -19,9 +19,6 @@ jobs:
           target: wasm32-unknown-unknown
           override: true
 
-      - name: Install wasm-pack
-        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-
       - name: Download cache
         uses: actions/cache@v2
         with:
@@ -32,6 +29,21 @@ jobs:
           restore-keys: |
             build-
 
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Install wasm-opt
+        run: |
+          test -f ~/.cargo/bin/wasm-opt || (\
+          version="version_104" \
+          && curl -L -o binaryen.tar.gz https://github.com/WebAssembly/binaryen/releases/download/${version}/binaryen-${version}-x86_64-linux.tar.gz \
+          && tar -xf binaryen.tar.gz \
+          && mv binaryen-${version}/bin/wasm-opt ~/.cargo/bin/wasm-opt \
+          )
+
+      - name: Install wasm-snip
+        run: test -f ~/.cargo/bin/wasm-snip || cargo install wasm-snip
+
       - uses: actions-rs/cargo@v1
         with:
           command: build
@@ -39,6 +51,12 @@ jobs:
 
       - name: Compile with wasm-pack
         run: wasm-pack build --target nodejs
+
+      - name: Shrink the wasm size
+        run: |
+          wasm-snip --snip-rust-panicking-code -p "core::fmt::float::<impl core::fmt::Display for f64>::fmt::.*" -o snipped.wasm pkg/elm_solve_deps_wasm_bg.wasm
+          wasm-opt -Oz -o output.wasm snipped.wasm
+          cp output.wasm pkg/elm_solve_deps_wasm_bg.wasm
 
       - name: Compress generated wasm package
         run: |
