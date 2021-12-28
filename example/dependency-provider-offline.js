@@ -8,10 +8,10 @@ module.exports.fetchElmJson = function fetchElmJson(pkg, version) {
   // console.log("Fetching: " + pkg + " @ " + version);
   try {
     return fs.readFileSync(homeElmJsonPath(pkg, version), "utf8");
-  } catch {
+  } catch (_) {
     try {
       return fs.readFileSync(cacheElmJsonPath(pkg, version), "utf8");
-    } catch {
+    } catch (_) {
       let remoteUrl = remoteElmJsonUrl(pkg, version);
       throw `Not doing a remote request to ${remoteUrl}. Please run at least once elm-test first.`;
     }
@@ -24,7 +24,7 @@ module.exports.listAvailableVersions = function listAvailableVersions(pkg) {
   let subdirectories;
   try {
     subdirectories = fs.readdirSync(homePkgPath(pkg));
-  } catch {
+  } catch (_) {
     console.log(`Directory "${homePkgPath(pkg)} does not exist`);
     console.log(
       `Not doing a request to the package server to find out existing versions. Please run at least once elm-test first.`
@@ -48,8 +48,8 @@ function cacheElmJsonPath(pkg, version) {
     elmHome(),
     "pubgrub",
     "elm_json_cache",
-    pkg.author,
-    pkg.pkg,
+    parts.author,
+    parts.pkg,
     version,
     "elm.json"
   );
