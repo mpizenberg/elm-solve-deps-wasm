@@ -26,12 +26,13 @@ let elm_json_config = `
     }
 }
 `;
-let solution = wasm.solve_deps(
-  elm_json_config,
-  false,
-  {},
-  depsProvider.fetchElmJson,
-  depsProvider.listAvailableVersions
-);
-
-console.log(JSON.parse(solution));
+(async () => {
+  let solution = await wasm.solve_deps(
+    elm_json_config,
+    false,
+    {},
+    depsProvider.fetchElmJson,
+    depsProvider.listAvailableVersions
+  );
+  console.log(JSON.parse(solution));
+})();

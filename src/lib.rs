@@ -43,7 +43,26 @@ pub fn init() {
 /// dependencies, as well as to list existing versions (in prefered order) for a given package.
 #[wasm_bindgen]
 pub fn solve_deps(
-    project_elm_json_str: &str,
+    project_elm_json_str: String,
+    use_test: bool,
+    // additional_constraints_str: &HashMap<String, Constraint>,
+    additional_constraints_str: JsValue,
+    // js_fetch_elm_json(pkg: &str, version: &str) -> String;
+    js_fetch_elm_json: js_sys::Function,
+    // js_list_available_versions(pkg: &str) -> Vec<String>;
+    js_list_available_versions: js_sys::Function,
+) -> js_sys::Promise {
+    wasm_bindgen_futures::future_to_promise(solve_deps_async(
+        project_elm_json_str,
+        use_test,
+        additional_constraints_str,
+        js_fetch_elm_json,
+        js_list_available_versions,
+    ))
+}
+
+async fn solve_deps_async(
+    project_elm_json_str: String,
     use_test: bool,
     // additional_constraints_str: &HashMap<String, Constraint>,
     additional_constraints_str: JsValue,
@@ -53,7 +72,7 @@ pub fn solve_deps(
     js_list_available_versions: js_sys::Function,
 ) -> Result<JsValue, JsValue> {
     // Load the elm.json of the package given as argument or of the current folder.
-    let project_elm_json: ProjectConfig = serde_json::from_str(project_elm_json_str)
+    let project_elm_json: ProjectConfig = serde_json::from_str(&project_elm_json_str)
         .context("Failed to decode the elm.json")
         .map_err(utils::report_error)?;
 
@@ -78,15 +97,11 @@ pub fn solve_deps(
                 let str_config = js_config.as_string().context("Not a string?")?;
                 Ok(serde_json::from_str(&str_config)?)
             }
-            Err(js_err) => {
-                let str_js_err =
-                    js_sys::JSON::stringify(&js_err).unwrap_or_else(|_| js_sys::JsString::from(""));
-                Err(format!(
-                    "An error occurred in the JS function call `fetch_elm_json({}, {})`.\n\n{}",
-                    pkg, version, str_js_err
-                )
-                .into())
-            }
+            Err(js_err) => Err(handle_js_error(
+                &format!("fetch_elm_json({}, {})", pkg, version),
+                &js_err,
+            )
+            .into()),
         }
     };
 
@@ -98,13 +113,7 @@ pub fn solve_deps(
             Ok(versions.into_iter().map(|v| SemVer::from_str(&v).unwrap()))
         }
         Err(js_err) => {
-            let str_js_err =
-                js_sys::JSON::stringify(&js_err).unwrap_or_else(|_| js_sys::JsString::from(""));
-            Err(format!(
-                "An error occurred in the JS function call `list_available_versions({})`.\n\n{}",
-                pkg, str_js_err
-            )
-            .into())
+            Err(handle_js_error(&format!("list_available_versions({})", pkg), &js_err).into())
         }
     };
 
@@ -124,6 +133,15 @@ pub fn solve_deps(
 }
 
 // Helper functions ######################################################################
+
+fn handle_js_error(fn_name: &str, js_err: &JsValue) -> String {
+    let str_js_err = js_sys::JSON::stringify(js_err)
+        .unwrap_or_else(|_| js_sys::JsString::from("(error cannot be displayed)"));
+    format!(
+        "An error occurred in the JS function call `{}`.\n\n{}",
+        fn_name, str_js_err
+    )
+}
 
 fn handle_pubgrub_error(err: PubGrubError<Pkg, SemVer>) -> anyhow::Error {
     match err {
