@@ -21,9 +21,9 @@ extern "C" {
 }
 
 // Macro console_log! similar to println!
-macro_rules! console_log {
-    ($($t:tt)*) => (crate::utils::log(&format_args!($($t)*).to_string()))
-}
+// macro_rules! console_log {
+//     ($($t:tt)*) => (crate::utils::log(&format_args!($($t)*).to_string()))
+// }
 
 // Log implementation
 
@@ -45,8 +45,12 @@ impl log::Log for WasmLogger {
         true
     }
 
-    fn log(&self, record: &Record) {
-        console_log!("{}: {}", record.level(), record.args());
+    // TODO: instead of silencing logs, we should call a js_sys::Function
+    // passed as argument when initializing the wasm logger.
+    // WasmLogger will not be able to stay static if we do that.
+    // In turn this means we'll need a struct in lib.rs holding a Box<WasmLogger>.
+    fn log(&self, _record: &Record) {
+        // console_log!("{}: {}", record.level(), record.args());
     }
 
     fn flush(&self) {}
