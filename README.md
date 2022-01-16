@@ -12,8 +12,8 @@ let solution = wasm.solve_deps(
   elm_json_config, // the elm.json that we have to solve
   use_test,
   additional_constraints,
-  fetchElmJson, // user defined (cf example/dependency-provider-offline.js)
-  listAvailableVersions // user defined (cf example/dependency-provider-offline.js)
+  fetchElmJson, // user defined (cf example-offline/dependency-provider-offline.js)
+  listAvailableVersions // user defined (cf example-offline/dependency-provider-offline.js)
 );
 ```
 
