@@ -95,7 +95,9 @@ pub fn solve_deps(
     {
         Ok(js_versions) => {
             let versions: Vec<String> = serde_wasm_bindgen::from_value(js_versions)?;
-            Ok(versions.into_iter().map(|v| SemVer::from_str(&v).unwrap()))
+            Ok(versions
+                .into_iter()
+                .filter_map(|v| SemVer::from_str(&v).ok()))
         }
         Err(js_err) => {
             let str_js_err =
