@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const process = require("process");
 const DependencyProvider = require("./Solver/DependencyProvider.js");
 

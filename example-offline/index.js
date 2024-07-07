@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 let depsProvider = require("./dependency-provider-offline.js");
 let wasm = require("elm-solve-deps-wasm");
 wasm.init();
