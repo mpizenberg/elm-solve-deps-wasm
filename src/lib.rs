@@ -40,7 +40,7 @@ pub fn init() {
 /// Include also test dependencies if `use_test` is `true`.
 /// It is possible to add additional constraints.
 /// The caller is responsible to provide implementations to be able to fetch the `elm.json` of
-/// dependencies, as well as to list existing versions (in prefered order) for a given package.
+/// dependencies, as well as to list existing versions (in preferred order) for a given package.
 #[wasm_bindgen]
 pub fn solve_deps(
     project_elm_json_str: &str,
