@@ -1,6 +1,6 @@
 // @ts-check
-const { parentPort, workerData } = require("worker_threads");
-const https = require("https");
+const { parentPort, workerData } = require("node:worker_threads");
+const https = require("node:https");
 
 const { sharedLock, requestPort } = workerData;
 const sharedLockArray = new Int32Array(sharedLock);

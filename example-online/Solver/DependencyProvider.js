@@ -1,7 +1,7 @@
 // @ts-check
-const fs = require("fs");
-const os = require("os");
-const path = require("path");
+const fs = require("node:fs");
+const os = require("node:os");
+const path = require("node:path");
 const wasm = require("elm-solve-deps-wasm");
 const SyncGet = require("./SyncGet.js");
 const collator = new Intl.Collator("en", { numeric: true }); // for sorting SemVer strings

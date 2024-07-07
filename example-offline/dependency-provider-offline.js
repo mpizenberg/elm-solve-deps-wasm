@@ -1,8 +1,8 @@
 // @ts-check
-let fs = require("fs");
-let os = require("os");
-let path = require("path");
-let process = require("process");
+let fs = require("node:fs");
+let os = require("node:os");
+let path = require("node:path");
+let process = require("node:process");
 
 /**
  * Rust: `fetchElmJson(pkg: &str, version: &str) -> String`

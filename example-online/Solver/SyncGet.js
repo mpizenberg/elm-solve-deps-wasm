@@ -1,10 +1,10 @@
 // @ts-check
-const path = require("path");
+const path = require("node:path");
 const {
   Worker,
   MessageChannel,
   receiveMessageOnPort,
-} = require("worker_threads");
+} = require("node:worker_threads");
 
 /**
  * Start a worker thread.
