@@ -37,6 +37,19 @@ pub fn init() {
     utils::WasmLogger::setup(utils::verbosity_filter(2)); // INFO
 }
 
+#[wasm_bindgen]
+/// Some types for the TS bindings.
+extern "C" {
+    #[wasm_bindgen(typescript_type = "Record<string, string>")]
+    pub type AdditionalConstraintsStr;
+
+    #[wasm_bindgen(extends = js_sys::Function, typescript_type = "(pkg: string) => string[]")]
+    pub type JsListAvailableVersions;
+
+    #[wasm_bindgen(extends = js_sys::Function, typescript_type = "(pkg: string, version: string) => string")]
+    pub type JsFetchElmJson;
+}
+
 /// Solve dependencies for the provided `elm.json`.
 ///
 /// Include also test dependencies if `use_test` is `true`.
@@ -56,12 +69,9 @@ pub fn init() {
 pub fn solve_deps(
     project_elm_json_str: &str,
     use_test: bool,
-    // additional_constraints_str: &HashMap<String, Constraint>,
-    additional_constraints_str: JsValue,
-    // js_fetch_elm_json(pkg: &str, version: &str) -> String;
-    js_fetch_elm_json: &js_sys::Function,
-    // js_list_available_versions(pkg: &str) -> Vec<String>;
-    js_list_available_versions: &js_sys::Function,
+    additional_constraints_str: AdditionalConstraintsStr,
+    js_fetch_elm_json: &JsFetchElmJson,
+    js_list_available_versions: &JsListAvailableVersions,
 ) -> Result<JsValue, JsValue> {
     // Load the elm.json of the package given as argument or of the current folder.
     let project_elm_json: ProjectConfig = serde_json::from_str(project_elm_json_str)
@@ -70,7 +80,7 @@ pub fn solve_deps(
 
     // Parse additional constraints.
     let additional_constraints: HashMap<String, String> =
-        serde_wasm_bindgen::from_value(additional_constraints_str)?;
+        serde_wasm_bindgen::from_value(additional_constraints_str.into())?;
     let additional_constraints: Vec<(Pkg, Constraint)> = additional_constraints
         .into_iter()
         .map(|(pkg, constraint)| {
