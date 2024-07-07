@@ -15,10 +15,10 @@ export function fetchElmJson(pkg, version) {
   // console.log("Fetching: " + pkg + " @ " + version);
   try {
     return fs.readFileSync(homeElmJsonPath(pkg, version), "utf8");
-  } catch (_) {
+  } catch {
     try {
       return fs.readFileSync(cacheElmJsonPath(pkg, version), "utf8");
-    } catch (_) {
+    } catch {
       let remoteUrl = remoteElmJsonUrl(pkg, version);
       throw `Not doing a remote request to ${remoteUrl}. Please run at least once elm-test first.`;
     }
@@ -36,7 +36,7 @@ export function listAvailableVersions(pkg) {
   let subdirectories;
   try {
     subdirectories = fs.readdirSync(homePkgPath(pkg));
-  } catch (_) {
+  } catch {
     console.log(`Directory "${homePkgPath(pkg)} does not exist`);
     console.log(
       `Not doing a request to the package server to find out existing versions. Please run at least once elm-test first.`,

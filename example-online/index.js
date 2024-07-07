@@ -42,7 +42,7 @@ function solveTestDependencies(elmJson) {
   };
   try {
     return DependencyProvider.solveOffline(elmJson, useTest, extra);
-  } catch (_) {
+  } catch {
     console.warn("Offline solver failed, switching to online solver.");
     return DependencyProvider.solveOnline(elmJson, useTest, extra);
   }
