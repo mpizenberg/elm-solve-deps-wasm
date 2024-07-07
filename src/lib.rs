@@ -12,9 +12,6 @@ use pubgrub::report::{DefaultStringReporter, Reporter};
 use pubgrub::version::SemanticVersion as SemVer;
 use wee_alloc::WeeAlloc;
 
-// Useful references:
-// Returning Vec<T>: https://github.com/rustwasm/wasm-bindgen/issues/111
-
 use elm_solve_deps::constraint::Constraint;
 use elm_solve_deps::project_config::{Pkg, ProjectConfig};
 use elm_solve_deps::solver::solve_deps_with;
