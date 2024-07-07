@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! WebAssembly module to solve dependencies in the elm ecosystem.
+#![warn(clippy::pedantic)]
 
 use std::collections::HashMap;
 use std::str::FromStr;
@@ -28,6 +29,10 @@ static ALLOC: WeeAlloc = WeeAlloc::INIT;
 
 /// Initialize the panic hook for more meaningful errors in case of panics,
 /// and also initialize the logger for the wasm code.
+///
+/// # Panics
+///
+/// Will panic if the logger cannot be initialized.
 #[wasm_bindgen]
 pub fn init() {
     utils::set_panic_hook();
@@ -41,6 +46,15 @@ pub fn init() {
 /// It is possible to add additional constraints.
 /// The caller is responsible to provide implementations to be able to fetch the `elm.json` of
 /// dependencies, as well as to list existing versions (in preferred order) for a given package.
+///
+/// # Errors
+///
+/// If there is a PubGrub error, it will be reported.
+///
+/// # Panics
+///
+/// If the `elm.json` cannot be decoded, it will panic.
+///
 #[wasm_bindgen]
 pub fn solve_deps(
     project_elm_json_str: &str,
@@ -48,9 +62,9 @@ pub fn solve_deps(
     // additional_constraints_str: &HashMap<String, Constraint>,
     additional_constraints_str: JsValue,
     // js_fetch_elm_json(pkg: &str, version: &str) -> String;
-    js_fetch_elm_json: js_sys::Function,
+    js_fetch_elm_json: &js_sys::Function,
     // js_list_available_versions(pkg: &str) -> Vec<String>;
-    js_list_available_versions: js_sys::Function,
+    js_list_available_versions: &js_sys::Function,
 ) -> Result<JsValue, JsValue> {
     // Load the elm.json of the package given as argument or of the current folder.
     let project_elm_json: ProjectConfig = serde_json::from_str(project_elm_json_str)
