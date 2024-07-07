@@ -72,7 +72,7 @@ pub fn solve_deps(
     additional_constraints_str: AdditionalConstraintsStr,
     js_fetch_elm_json: &JsFetchElmJson,
     js_list_available_versions: &JsListAvailableVersions,
-) -> Result<JsValue, JsValue> {
+) -> Result<String, JsValue> {
     // Load the elm.json of the package given as argument or of the current folder.
     let project_elm_json: ProjectConfig = serde_json::from_str(project_elm_json_str)
         .context("Failed to decode the elm.json")
@@ -138,7 +138,7 @@ pub fn solve_deps(
     ) {
         Ok(solution) => {
             let solution_json = serde_json::to_string(&solution).unwrap();
-            Ok(JsValue::from_str(&solution_json))
+            Ok(solution_json)
         }
         Err(err) => Err(utils::report_error(handle_pubgrub_error(err))),
     }
