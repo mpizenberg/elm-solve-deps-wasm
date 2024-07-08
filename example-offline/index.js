@@ -32,7 +32,7 @@ let solution = wasm.solve_deps(
   false,
   {},
   depsProvider.fetchElmJson,
-  depsProvider.listAvailableVersions
+  depsProvider.listAvailableVersions,
 );
 
 console.log(JSON.parse(solution));

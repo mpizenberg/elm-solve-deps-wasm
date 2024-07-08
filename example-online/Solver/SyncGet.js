@@ -1,12 +1,12 @@
 // @flow
 
-const path = require('path');
+const path = require("path");
 const {
   Worker,
   MessageChannel,
   receiveMessageOnPort,
   // $FlowFixMe[cannot-resolve-module]: Flow doesn’t seem to know about the `worker_threads` module yet.
-} = require('worker_threads');
+} = require("worker_threads");
 
 // Start a worker thread and return a `syncGetWorker`
 // capable of making sync requests until shut down.
@@ -18,7 +18,7 @@ function startWorker() /*: {
   const sharedLock = new SharedArrayBuffer(4);
   // $FlowFixMe[incompatible-call]: Flow is wrong and says `sharedLock` is not an accepted parameter here.
   const sharedLockArray = new Int32Array(sharedLock);
-  const workerPath = path.resolve(__dirname, 'SyncGetWorker.js');
+  const workerPath = path.resolve(__dirname, "SyncGetWorker.js");
   const worker = new Worker(workerPath, {
     workerData: { sharedLock, requestPort: workerPort },
     transferList: [workerPort],

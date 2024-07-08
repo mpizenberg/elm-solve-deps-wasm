@@ -1,11 +1,11 @@
 // @flow
 
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const wasm = require('elm-solve-deps-wasm');
-const SyncGet = require('./SyncGet.js');
-const collator = new Intl.Collator('en', { numeric: true }); // for sorting SemVer strings
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
+const wasm = require("elm-solve-deps-wasm");
+const SyncGet = require("./SyncGet.js");
+const collator = new Intl.Collator("en", { numeric: true }); // for sorting SemVer strings
 
 // Initialization work done only once.
 wasm.init();
@@ -23,7 +23,7 @@ const listVersionsMemoCache /*: Map<string, Array<string>> */ = new Map();
 function solveOffline(
   elmJson /*: string */,
   useTest /*: boolean */,
-  extra /*: { [string]: string } */
+  extra /*: { [string]: string } */,
 ) /*: string */ {
   listVersionsMemoCache.clear();
   try {
@@ -32,7 +32,7 @@ function solveOffline(
       useTest,
       extra,
       fetchElmJsonOffline,
-      listAvailableVersionsOffline
+      listAvailableVersionsOffline,
     );
   } catch (errorMessage) {
     throw new Error(errorMessage);
@@ -43,7 +43,7 @@ function solveOffline(
 function solveOnline(
   elmJson /*: string */,
   useTest /*: boolean */,
-  extra /*: { [string]: string } */
+  extra /*: { [string]: string } */,
 ) /*: string */ {
   updateOnlineVersionsCache();
   listVersionsMemoCache.clear();
@@ -53,7 +53,7 @@ function solveOnline(
       useTest,
       extra,
       fetchElmJsonOnline,
-      listAvailableVersionsOnline
+      listAvailableVersionsOnline,
     );
   } catch (errorMessage) {
     throw new Error(errorMessage);
@@ -62,7 +62,7 @@ function solveOnline(
 
 function fetchElmJsonOnline(
   pkg /*: string */,
-  version /*: string */
+  version /*: string */,
 ) /*: string */ {
   try {
     return fetchElmJsonOffline(pkg, version);
@@ -83,31 +83,31 @@ function fetchElmJsonOnline(
 
 function fetchElmJsonOffline(
   pkg /*: string */,
-  version /*: string */
+  version /*: string */,
 ) /*: string */ {
   try {
-    return fs.readFileSync(homeElmJsonPath(pkg, version), 'utf8');
+    return fs.readFileSync(homeElmJsonPath(pkg, version), "utf8");
   } catch (_) {
     // The read can only fail if the elm.json file does not exist
     // or if we don't have the permissions to read it so it's fine to catch all.
     // Otherwise, it means that `homeElmJsonPath()` failed while processing `pkg` and `version`.
     // In such case, again, it's fine to catch all since the next call to `cacheElmJsonPath()`
     // will fail the same anyway.
-    return fs.readFileSync(cacheElmJsonPath(pkg, version), 'utf8');
+    return fs.readFileSync(cacheElmJsonPath(pkg, version), "utf8");
   }
 }
 
 // Update the `onlineVersionsCache` global variable.
 function updateOnlineVersionsCache() /*: void */ {
-  const pubgrubHome = path.join(elmHome(), 'pubgrub');
+  const pubgrubHome = path.join(elmHome(), "pubgrub");
   fs.mkdirSync(pubgrubHome, { recursive: true });
-  const cachePath = path.join(pubgrubHome, 'versions_cache.json');
-  const remotePackagesUrl = 'https://package.elm-lang.org/all-packages';
+  const cachePath = path.join(pubgrubHome, "versions_cache.json");
+  const remotePackagesUrl = "https://package.elm-lang.org/all-packages";
   if (onlineVersionsCache.size === 0) {
     let cacheFile;
     try {
       // Read from disk existing versions which are already cached.
-      cacheFile = fs.readFileSync(cachePath, 'utf8');
+      cacheFile = fs.readFileSync(cachePath, "utf8");
     } catch (_) {
       // The cache file does not exist so let's reset it.
       updateCacheFromScratch(cachePath, remotePackagesUrl);
@@ -117,7 +117,7 @@ function updateOnlineVersionsCache() /*: void */ {
       onlineVersionsCache = parseOnlineVersions(JSON.parse(cacheFile));
     } catch (error) {
       throw new Error(
-        `Failed to parse the cache file ${cachePath}.\n${error.message}`
+        `Failed to parse the cache file ${cachePath}.\n${error.message}`,
       );
     }
   }
@@ -128,7 +128,7 @@ function updateOnlineVersionsCache() /*: void */ {
 // with a request to the package server.
 function updateCacheFromScratch(
   cachePath /*: string */,
-  remotePackagesUrl /*: string */
+  remotePackagesUrl /*: string */,
 ) /*: void */ {
   const onlineVersionsJson = syncGetWorker.get(remotePackagesUrl);
   fs.writeFileSync(cachePath, onlineVersionsJson);
@@ -137,7 +137,7 @@ function updateCacheFromScratch(
     onlineVersionsCache = parseOnlineVersions(onlineVersions);
   } catch (error) {
     throw new Error(
-      `Failed to parse the response from the request to ${remotePackagesUrl}.\n${error.message}`
+      `Failed to parse the response from the request to ${remotePackagesUrl}.\n${error.message}`,
     );
   }
 }
@@ -145,7 +145,7 @@ function updateCacheFromScratch(
 // Update the cache with a request to the package server.
 function updateCacheWithRequestSince(
   cachePath /*: string */,
-  remotePackagesUrl /*: string */
+  remotePackagesUrl /*: string */,
 ) /*: void */ {
   // Count existing versions.
   let versionsCount = 0;
@@ -154,7 +154,7 @@ function updateCacheWithRequestSince(
   }
 
   // Complete cache with a remote call to the package server.
-  const remoteUrl = remotePackagesUrl + '/since/' + (versionsCount - 1); // -1 to check if no package was deleted.
+  const remoteUrl = remotePackagesUrl + "/since/" + (versionsCount - 1); // -1 to check if no package was deleted.
   const newVersions = JSON.parse(syncGetWorker.get(remoteUrl));
   if (newVersions.length === 0) {
     // Reload from scratch since it means at least one package was deleted from the registry.
@@ -239,13 +239,13 @@ function semverCompare(a /*: string */, b /*: string */) /*: number */ {
 }
 
 function parseOnlineVersions(
-  json /*: mixed */
+  json /*: mixed */,
 ) /*: Map<string, Array<string>> */ {
-  if (typeof json !== 'object' || json === null || Array.isArray(json)) {
+  if (typeof json !== "object" || json === null || Array.isArray(json)) {
     throw new Error(
       `Expected an object, but got: ${
-        json === null ? 'null' : Array.isArray(json) ? 'Array' : typeof json
-      }`
+        json === null ? "null" : Array.isArray(json) ? "Array" : typeof json
+      }`,
     );
   }
 
@@ -260,20 +260,20 @@ function parseOnlineVersions(
 
 function parseVersions(
   key /*: string */,
-  json /*: mixed */
+  json /*: mixed */,
 ) /*: Array<string> */ {
   if (!Array.isArray(json)) {
     throw new Error(
-      `Expected ${JSON.stringify(key)} to be an array, but got: ${typeof json}`
+      `Expected ${JSON.stringify(key)} to be an array, but got: ${typeof json}`,
     );
   }
 
   for (const [index, item] of json.entries()) {
-    if (typeof item !== 'string') {
+    if (typeof item !== "string") {
       throw new Error(
         `Expected${JSON.stringify(
-          key
-        )}->${index} to be a string, but got: ${typeof item}`
+          key,
+        )}->${index} to be a string, but got: ${typeof item}`,
       );
     }
   }
@@ -284,44 +284,44 @@ function parseVersions(
 
 function remoteElmJsonUrl(
   pkg /*: string */,
-  version /*: string */
+  version /*: string */,
 ) /*: string */ {
   return `https://package.elm-lang.org/packages/${pkg}/${version}/elm.json`;
 }
 
 function cacheElmJsonPath(
   pkg /*: string */,
-  version /*: string */
+  version /*: string */,
 ) /*: string */ {
   const parts = splitAuthorPkg(pkg);
   return path.join(
     elmHome(),
-    'pubgrub',
-    'elm_json_cache',
+    "pubgrub",
+    "elm_json_cache",
     parts.author,
     parts.pkg,
     version,
-    'elm.json'
+    "elm.json",
   );
 }
 
 function homeElmJsonPath(
   pkg /*: string */,
-  version /*: string */
+  version /*: string */,
 ) /*: string */ {
-  return path.join(homePkgPath(pkg), version, 'elm.json');
+  return path.join(homePkgPath(pkg), version, "elm.json");
 }
 
 function homePkgPath(pkg /*: string */) /*: string */ {
   const parts = splitAuthorPkg(pkg);
-  return path.join(elmHome(), '0.19.1', 'packages', parts.author, parts.pkg);
+  return path.join(elmHome(), "0.19.1", "packages", parts.author, parts.pkg);
 }
 
 function splitAuthorPkg(pkgIdentifier /*: string */) /*: {
   author: string,
   pkg: string,
 } */ {
-  const parts = pkgIdentifier.split('/');
+  const parts = pkgIdentifier.split("/");
   return { author: parts[0], pkg: parts[1] };
 }
 
@@ -329,32 +329,32 @@ function splitPkgVersion(str /*: string */) /*: {
   pkg: string,
   version: string,
 } */ {
-  const parts = str.split('@');
+  const parts = str.split("@");
   return { pkg: parts[0], version: parts[1] };
 }
 
 function elmHome() /*: string */ {
-  const elmHomeEnv = process.env['ELM_HOME'];
+  const elmHomeEnv = process.env["ELM_HOME"];
   return elmHomeEnv === undefined ? defaultElmHome() : elmHomeEnv;
 }
 
 function defaultElmHome() /*: string */ {
-  return process.platform === 'win32'
+  return process.platform === "win32"
     ? defaultWindowsElmHome()
     : defaultUnixElmHome();
 }
 
 function defaultUnixElmHome() /*: string */ {
-  return path.join(os.homedir(), '.elm');
+  return path.join(os.homedir(), ".elm");
 }
 
 function defaultWindowsElmHome() /*: string */ {
   const appData = process.env.APPDATA;
   const dir =
     appData === undefined
-      ? path.join(os.homedir(), 'AppData', 'Roaming')
+      ? path.join(os.homedir(), "AppData", "Roaming")
       : appData;
-  return path.join(dir, 'elm');
+  return path.join(dir, "elm");
 }
 
 module.exports = {

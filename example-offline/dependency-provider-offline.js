@@ -27,7 +27,7 @@ module.exports.listAvailableVersions = function listAvailableVersions(pkg) {
   } catch (_) {
     console.log(`Directory "${homePkgPath(pkg)} does not exist`);
     console.log(
-      `Not doing a request to the package server to find out existing versions. Please run at least once elm-test first.`
+      `Not doing a request to the package server to find out existing versions. Please run at least once elm-test first.`,
     );
     return [];
   }
@@ -51,7 +51,7 @@ function cacheElmJsonPath(pkg, version) {
     parts.author,
     parts.pkg,
     version,
-    "elm.json"
+    "elm.json",
   );
 }
 
