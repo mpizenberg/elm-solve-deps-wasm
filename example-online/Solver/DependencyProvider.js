@@ -1,13 +1,13 @@
 // @ts-check
-const fs = require("node:fs");
-const os = require("node:os");
-const path = require("node:path");
-const wasm = require("elm-solve-deps-wasm");
-const SyncGet = require("./SyncGet.js");
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import * as SyncGet from "./SyncGet.js";
+import wasm from "elm-solve-deps-wasm";
+wasm.init(); // Initialization work done only once.
+
 const collator = new Intl.Collator("en", { numeric: true }); // for sorting SemVer strings
 
-// Initialization work done only once.
-wasm.init();
 /** @type {{ get: (string: string) => string, shutDown: () => void }} */
 const syncGetWorker = SyncGet.startWorker();
 
@@ -427,7 +427,4 @@ function defaultWindowsElmHome() {
   return path.join(dir, "elm");
 }
 
-module.exports = {
-  solveOffline,
-  solveOnline,
-};
+export { solveOffline, solveOnline };

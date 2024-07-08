@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // @ts-check
-const process = require("node:process");
-const DependencyProvider = require("./Solver/DependencyProvider.js");
+import process from "node:process";
+import * as DependencyProvider from "./Solver/DependencyProvider.js";
 
 const elmJsonStr = `
 {

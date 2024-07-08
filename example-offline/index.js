@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // @ts-check
-let depsProvider = require("./dependency-provider-offline.js");
-let wasm = require("elm-solve-deps-wasm");
+import * as depsProvider from "./dependency-provider-offline.js";
+import wasm from "elm-solve-deps-wasm";
 wasm.init();
 
 let elm_json_config = `

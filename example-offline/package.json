@@ -1,6 +1,7 @@
 {
   "name": "elm-deps-offline",
   "private": true,
+  "type": "module",
   "version": "1.0.0",
   "description": "Example usage of elm-solve-deps-wasm",
   "main": "index.js",

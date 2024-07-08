@@ -1,10 +1,10 @@
 // @ts-check
-const path = require("node:path");
-const {
+import path from "node:path";
+import {
   Worker,
   MessageChannel,
   receiveMessageOnPort,
-} = require("node:worker_threads");
+} from "node:worker_threads";
 
 /**
  * Start a worker thread.
@@ -39,6 +39,4 @@ function startWorker() {
   return { get, shutDown };
 }
 
-module.exports = {
-  startWorker,
-};
+export { startWorker };

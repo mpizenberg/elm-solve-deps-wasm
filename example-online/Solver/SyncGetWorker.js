@@ -1,6 +1,6 @@
 // @ts-check
-const { parentPort, workerData } = require("node:worker_threads");
-const https = require("node:https");
+import { parentPort, workerData } from "node:worker_threads";
+import https from "node:https";
 
 const { sharedLock, requestPort } = workerData;
 const sharedLockArray = new Int32Array(sharedLock);

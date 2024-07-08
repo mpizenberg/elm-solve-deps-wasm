@@ -1,8 +1,8 @@
 // @ts-check
-let fs = require("node:fs");
-let os = require("node:os");
-let path = require("node:path");
-let process = require("node:process");
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import process from "node:process";
 
 /**
  * Rust: `fetchElmJson(pkg: &str, version: &str) -> String`
@@ -11,7 +11,7 @@ let process = require("node:process");
  * @param {string} version
  * @returns {string}
  */
-module.exports.fetchElmJson = function fetchElmJson(pkg, version) {
+export function fetchElmJson(pkg, version) {
   // console.log("Fetching: " + pkg + " @ " + version);
   try {
     return fs.readFileSync(homeElmJsonPath(pkg, version), "utf8");
@@ -23,7 +23,7 @@ module.exports.fetchElmJson = function fetchElmJson(pkg, version) {
       throw `Not doing a remote request to ${remoteUrl}. Please run at least once elm-test first.`;
     }
   }
-};
+}
 
 /**
  * Rust: `listAvailableVersions(pkg: &str) -> Vec<String>`
@@ -31,7 +31,7 @@ module.exports.fetchElmJson = function fetchElmJson(pkg, version) {
  * @param {string} pkg
  * @returns {string[]}
  */
-module.exports.listAvailableVersions = function listAvailableVersions(pkg) {
+export function listAvailableVersions(pkg) {
   // console.log("List versions of: " + pkg);
   let subdirectories;
   try {
@@ -46,7 +46,7 @@ module.exports.listAvailableVersions = function listAvailableVersions(pkg) {
 
   // Reverse order of subdirectories to have newest versions first.
   return subdirectories.reverse();
-};
+}
 
 // Helper functions ##################################################
 
