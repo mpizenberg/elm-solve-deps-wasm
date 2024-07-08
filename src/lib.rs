@@ -93,8 +93,7 @@ pub fn solve_deps(
                 let str_js_err =
                     js_sys::JSON::stringify(&js_err).unwrap_or_else(|_| js_sys::JsString::from(""));
                 Err(format!(
-                    "An error occurred in the JS function call `fetch_elm_json({}, {})`.\n\n{}",
-                    pkg, version, str_js_err
+                    "An error occurred in the JS function call `fetch_elm_json({pkg}, {version})`.\n\n{str_js_err}"
                 )
                 .into())
             }
@@ -114,8 +113,7 @@ pub fn solve_deps(
             let str_js_err =
                 js_sys::JSON::stringify(&js_err).unwrap_or_else(|_| js_sys::JsString::from(""));
             Err(format!(
-                "An error occurred in the JS function call `list_available_versions({})`.\n\n{}",
-                pkg, str_js_err
+                "An error occurred in the JS function call `list_available_versions({pkg})`.\n\n{str_js_err}"
             )
             .into())
         }

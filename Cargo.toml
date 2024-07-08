@@ -8,7 +8,6 @@ repository = "https://github.com/mpizenberg/elm-solve-deps-wasm"
 license = "MPL-2.0"
 keywords = ["dependency", "pubgrub", "solver", "version", "elm"]
 categories = ["algorithms"]
-rust-version = "1.56.0"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
