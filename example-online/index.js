@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// @ts-check
 const process = require("process");
 const DependencyProvider = require("./Solver/DependencyProvider.js");
 
@@ -27,7 +28,11 @@ const elmJsonStr = `
 }
 `;
 
-function solveTestDependencies(elmJson /*: string */) /*: string */ {
+/**
+ * @param {string} elmJson
+ * @returns {string}
+ */
+function solveTestDependencies(elmJson) {
   const useTest = true;
   const extra = {
     "elm/core": "1.0.0 <= v < 2.0.0",

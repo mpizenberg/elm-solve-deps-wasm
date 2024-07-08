@@ -1,9 +1,16 @@
+// @ts-check
 let fs = require("fs");
 let os = require("os");
 let path = require("path");
 let process = require("process");
 
-// fetchElmJson(pkg: &str, version: &str) -> String;
+/**
+ * Rust: `fetchElmJson(pkg: &str, version: &str) -> String`
+ *
+ * @param {string} pkg
+ * @param {string} version
+ * @returns {string}
+ */
 module.exports.fetchElmJson = function fetchElmJson(pkg, version) {
   // console.log("Fetching: " + pkg + " @ " + version);
   try {
@@ -18,7 +25,12 @@ module.exports.fetchElmJson = function fetchElmJson(pkg, version) {
   }
 };
 
-// listAvailableVersions(pkg: &str) -> Vec<JsValue>;
+/**
+ * Rust: `listAvailableVersions(pkg: &str) -> Vec<String>`
+ *
+ * @param {string} pkg
+ * @returns {string[]}
+ */
 module.exports.listAvailableVersions = function listAvailableVersions(pkg) {
   // console.log("List versions of: " + pkg);
   let subdirectories;
@@ -85,5 +97,5 @@ function defaultUnixElmHome() {
 }
 
 function defaultWindowsElmHome() {
-  return path.join(process.env.APPDATA, "elm");
+  return path.join(process.env.APPDATA ?? "", "elm");
 }

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// @ts-check
 let depsProvider = require("./dependency-provider-offline.js");
 let wasm = require("elm-solve-deps-wasm");
 wasm.init();
