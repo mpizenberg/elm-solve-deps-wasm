@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 //! WebAssembly module to solve dependencies in the elm ecosystem.
+#![warn(clippy::pedantic)]
 
 use std::collections::HashMap;
 use std::str::FromStr;
@@ -10,9 +11,6 @@ use pubgrub::error::PubGrubError;
 use pubgrub::report::{DefaultStringReporter, Reporter};
 use pubgrub::version::SemanticVersion as SemVer;
 use wee_alloc::WeeAlloc;
-
-// Useful references:
-// Returning Vec<T>: https://github.com/rustwasm/wasm-bindgen/issues/111
 
 use elm_solve_deps::constraint::Constraint;
 use elm_solve_deps::project_config::{Pkg, ProjectConfig};
@@ -28,6 +26,10 @@ static ALLOC: WeeAlloc = WeeAlloc::INIT;
 
 /// Initialize the panic hook for more meaningful errors in case of panics,
 /// and also initialize the logger for the wasm code.
+///
+/// # Panics
+///
+/// Will panic if the logger cannot be initialized.
 #[wasm_bindgen]
 pub fn init() {
     utils::set_panic_hook();
@@ -35,23 +37,42 @@ pub fn init() {
     utils::WasmLogger::setup(utils::verbosity_filter(2)); // INFO
 }
 
+#[wasm_bindgen]
+/// Some types for the TS bindings.
+extern "C" {
+    #[wasm_bindgen(typescript_type = "Record<string, string>")]
+    pub type AdditionalConstraintsStr;
+
+    #[wasm_bindgen(extends = js_sys::Function, typescript_type = "(pkg: string) => string[]")]
+    pub type JsListAvailableVersions;
+
+    #[wasm_bindgen(extends = js_sys::Function, typescript_type = "(pkg: string, version: string) => string")]
+    pub type JsFetchElmJson;
+}
+
 /// Solve dependencies for the provided `elm.json`.
 ///
 /// Include also test dependencies if `use_test` is `true`.
 /// It is possible to add additional constraints.
 /// The caller is responsible to provide implementations to be able to fetch the `elm.json` of
-/// dependencies, as well as to list existing versions (in prefered order) for a given package.
+/// dependencies, as well as to list existing versions (in preferred order) for a given package.
+///
+/// # Errors
+///
+/// If there is a PubGrub error, it will be reported.
+///
+/// # Panics
+///
+/// If the `elm.json` cannot be decoded, it will panic.
+///
 #[wasm_bindgen]
 pub fn solve_deps(
     project_elm_json_str: &str,
     use_test: bool,
-    // additional_constraints_str: &HashMap<String, Constraint>,
-    additional_constraints_str: JsValue,
-    // js_fetch_elm_json(pkg: &str, version: &str) -> String;
-    js_fetch_elm_json: js_sys::Function,
-    // js_list_available_versions(pkg: &str) -> Vec<String>;
-    js_list_available_versions: js_sys::Function,
-) -> Result<JsValue, JsValue> {
+    additional_constraints_str: AdditionalConstraintsStr,
+    js_fetch_elm_json: &JsFetchElmJson,
+    js_list_available_versions: &JsListAvailableVersions,
+) -> Result<String, JsValue> {
     // Load the elm.json of the package given as argument or of the current folder.
     let project_elm_json: ProjectConfig = serde_json::from_str(project_elm_json_str)
         .context("Failed to decode the elm.json")
@@ -59,7 +80,7 @@ pub fn solve_deps(
 
     // Parse additional constraints.
     let additional_constraints: HashMap<String, String> =
-        serde_wasm_bindgen::from_value(additional_constraints_str)?;
+        serde_wasm_bindgen::from_value(additional_constraints_str.into())?;
     let additional_constraints: Vec<(Pkg, Constraint)> = additional_constraints
         .into_iter()
         .map(|(pkg, constraint)| {
@@ -82,8 +103,7 @@ pub fn solve_deps(
                 let str_js_err =
                     js_sys::JSON::stringify(&js_err).unwrap_or_else(|_| js_sys::JsString::from(""));
                 Err(format!(
-                    "An error occurred in the JS function call `fetch_elm_json({}, {})`.\n\n{}",
-                    pkg, version, str_js_err
+                    "An error occurred in the JS function call `fetch_elm_json({pkg}, {version})`.\n\n{str_js_err}"
                 )
                 .into())
             }
@@ -103,8 +123,7 @@ pub fn solve_deps(
             let str_js_err =
                 js_sys::JSON::stringify(&js_err).unwrap_or_else(|_| js_sys::JsString::from(""));
             Err(format!(
-                "An error occurred in the JS function call `list_available_versions({})`.\n\n{}",
-                pkg, str_js_err
+                "An error occurred in the JS function call `list_available_versions({pkg})`.\n\n{str_js_err}"
             )
             .into())
         }
@@ -119,7 +138,7 @@ pub fn solve_deps(
     ) {
         Ok(solution) => {
             let solution_json = serde_json::to_string(&solution).unwrap();
-            Ok(JsValue::from_str(&solution_json))
+            Ok(solution_json)
         }
         Err(err) => Err(utils::report_error(handle_pubgrub_error(err))),
     }
