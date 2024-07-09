@@ -1,5 +1,7 @@
-let depsProvider = require("./dependency-provider-offline.js");
-let wasm = require("elm-solve-deps-wasm");
+#!/usr/bin/env node
+// @ts-check
+import * as depsProvider from "./dependency-provider-offline.js";
+import wasm from "elm-solve-deps-wasm";
 wasm.init();
 
 let elm_json_config = `
@@ -31,7 +33,7 @@ let solution = wasm.solve_deps(
   false,
   {},
   depsProvider.fetchElmJson,
-  depsProvider.listAvailableVersions
+  depsProvider.listAvailableVersions,
 );
 
 console.log(JSON.parse(solution));

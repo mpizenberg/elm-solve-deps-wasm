@@ -1,5 +1,7 @@
-const process = require("process");
-const DependencyProvider = require("./Solver/DependencyProvider.js");
+#!/usr/bin/env node
+// @ts-check
+import process from "node:process";
+import * as DependencyProvider from "./Solver/DependencyProvider.js";
 
 const elmJsonStr = `
 {
@@ -26,7 +28,11 @@ const elmJsonStr = `
 }
 `;
 
-function solveTestDependencies(elmJson /*: string */) /*: string */ {
+/**
+ * @param {string} elmJson
+ * @returns {string}
+ */
+function solveTestDependencies(elmJson) {
   const useTest = true;
   const extra = {
     "elm/core": "1.0.0 <= v < 2.0.0",
@@ -36,7 +42,7 @@ function solveTestDependencies(elmJson /*: string */) /*: string */ {
   };
   try {
     return DependencyProvider.solveOffline(elmJson, useTest, extra);
-  } catch (_) {
+  } catch {
     console.warn("Offline solver failed, switching to online solver.");
     return DependencyProvider.solveOnline(elmJson, useTest, extra);
   }

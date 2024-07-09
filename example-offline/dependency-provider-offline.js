@@ -1,40 +1,52 @@
-let fs = require("fs");
-let os = require("os");
-let path = require("path");
-let process = require("process");
+// @ts-check
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import process from "node:process";
 
-// fetchElmJson(pkg: &str, version: &str) -> String;
-module.exports.fetchElmJson = function fetchElmJson(pkg, version) {
+/**
+ * Rust: `fetchElmJson(pkg: &str, version: &str) -> String`
+ *
+ * @param {string} pkg
+ * @param {string} version
+ * @returns {string}
+ */
+export function fetchElmJson(pkg, version) {
   // console.log("Fetching: " + pkg + " @ " + version);
   try {
     return fs.readFileSync(homeElmJsonPath(pkg, version), "utf8");
-  } catch (_) {
+  } catch {
     try {
       return fs.readFileSync(cacheElmJsonPath(pkg, version), "utf8");
-    } catch (_) {
+    } catch {
       let remoteUrl = remoteElmJsonUrl(pkg, version);
-      throw `Not doing a remote request to ${remoteUrl}. Please run at least once elm-test first.`;
+      throw `Not doing a remote request to ${remoteUrl}. Please run elm-test at least once first.`;
     }
   }
-};
+}
 
-// listAvailableVersions(pkg: &str) -> Vec<JsValue>;
-module.exports.listAvailableVersions = function listAvailableVersions(pkg) {
+/**
+ * Rust: `listAvailableVersions(pkg: &str) -> Vec<String>`
+ *
+ * @param {string} pkg
+ * @returns {string[]}
+ */
+export function listAvailableVersions(pkg) {
   // console.log("List versions of: " + pkg);
   let subdirectories;
   try {
     subdirectories = fs.readdirSync(homePkgPath(pkg));
-  } catch (_) {
+  } catch {
     console.log(`Directory "${homePkgPath(pkg)} does not exist`);
     console.log(
-      `Not doing a request to the package server to find out existing versions. Please run at least once elm-test first.`
+      `Not doing a request to the package server to find out existing versions. Please run elm-test at least once first.`,
     );
     return [];
   }
 
   // Reverse order of subdirectories to have newest versions first.
   return subdirectories.reverse();
-};
+}
 
 // Helper functions ##################################################
 
@@ -51,7 +63,7 @@ function cacheElmJsonPath(pkg, version) {
     parts.author,
     parts.pkg,
     version,
-    "elm.json"
+    "elm.json",
   );
 }
 
@@ -85,5 +97,5 @@ function defaultUnixElmHome() {
 }
 
 function defaultWindowsElmHome() {
-  return path.join(process.env.APPDATA, "elm");
+  return path.join(process.env.APPDATA ?? "", "elm");
 }

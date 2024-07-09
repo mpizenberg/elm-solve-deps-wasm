@@ -1,13 +1,11 @@
-// @flow
-
-// $FlowFixMe[cannot-resolve-module]: Flow doesn’t seem to know about the `worker_threads` module yet.
-const { parentPort, workerData } = require('worker_threads');
-const https = require('https');
+// @ts-check
+import { parentPort, workerData } from "node:worker_threads";
+import https from "node:https";
 
 const { sharedLock, requestPort } = workerData;
 const sharedLockArray = new Int32Array(sharedLock);
 
-parentPort.on('message', async (url) => {
+parentPort?.on("message", async (url) => {
   try {
     const response = await getBody(url);
     requestPort.postMessage(response);
@@ -17,19 +15,23 @@ parentPort.on('message', async (url) => {
   Atomics.notify(sharedLockArray, 0, Infinity);
 });
 
-async function getBody(url /*: string */) /*: Promise<string> */ {
+/**
+ * @param {string} url
+ * @returns {Promise<string>}
+ */
+async function getBody(url) {
   return new Promise(function (resolve, reject) {
     https
       .get(url, function (res) {
-        let body = '';
-        res.on('data', function (chunk) {
+        let body = "";
+        res.on("data", function (chunk) {
           body += chunk;
         });
-        res.on('end', function () {
+        res.on("end", function () {
           resolve(body);
         });
       })
-      .on('error', function (err) {
+      .on("error", function (err) {
         reject(err);
       });
   });

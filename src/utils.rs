@@ -36,7 +36,7 @@ impl WasmLogger {
         log::set_logger(&LOGGER)
     }
     pub fn setup(max_level: LevelFilter) {
-        log::set_max_level(max_level)
+        log::set_max_level(max_level);
     }
 }
 
@@ -66,7 +66,7 @@ pub fn verbosity_filter(verbosity: u32) -> LevelFilter {
     }
 }
 
-/// Log the error and convert it into a JsValue.
+/// Log the error and convert it into a `JsValue`.
 pub fn report_error<E: Into<anyhow::Error>>(error: E) -> JsValue {
     let error_msg = format!("{:?}", error.into());
     log::error!("{}", &error_msg);
