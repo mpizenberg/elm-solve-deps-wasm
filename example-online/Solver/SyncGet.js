@@ -17,7 +17,7 @@ function startWorker() {
   const { port1: localPort, port2: workerPort } = new MessageChannel();
   const sharedLock = new SharedArrayBuffer(4);
   const sharedLockArray = new Int32Array(sharedLock);
-  const workerPath = path.resolve(__dirname, "SyncGetWorker.js");
+  const workerPath = new URL(import.meta.resolve("./SyncGetWorker.js"));
   const worker = new Worker(workerPath, {
     workerData: { sharedLock, requestPort: workerPort },
     transferList: [workerPort],
